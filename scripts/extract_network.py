@@ -11,7 +11,8 @@ import click
 def extract_network(input, output, threshold):
     string = pd.read_csv(input, sep=" ")
     significant = string[string.combined_score >= threshold]
-    significant.to_csv(output)
+    significant.to_csv(
+        output, columns=['protein1', 'protein2'], index=False, header=False, sep=" ")
 
 
 if __name__ == "__main__":

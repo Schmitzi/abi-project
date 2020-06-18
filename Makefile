@@ -12,3 +12,6 @@ intermediates:
 intermediates/network.csv: data/string.txt $(EXTRACT_NET_SRC) intermediates
 	$(EXTRACT_NET_EXE) -i "$<" -o "$@" -t "$(NET_SIG_THRESHOLD)"
 
+.PHONY: clean
+clean: 
+	rm -rf intermediates

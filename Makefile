@@ -1,22 +1,35 @@
 include config.mk
 
+.PHONY: all
+all: protein_domains_vs_string_degree.png
+
+# Download data
 data:
 	mkdir -p $@
 
 data/interactions.txt: data
 	curl $(STRING_URL) | gunzip > $@
 
+# Do some rudimentary preprocessing to strip info we don't need
+preprocessing:
+	mkdir -p $@
+
+preprocessing/interactions.txt: data/interactions.txt preprocessing
+	 sed -E 's/[0-9]{4}\.//g' "$<" > "$@"
+
+# Table of domains has a lot of duplicate entries
+preprocessing/domains.txt: data/domains.txt preprocessing
+	sort -u "$<" > "$@"
+
+# Compute intermediate results
 intermediates:
 	mkdir -p $@
 
-intermediates/interactions_preprocessed.txt: data/interactions.txt intermediates
-	 sed -E 's/[0-9]{4}\.//g' "$<" > "$@"
-
-intermediates/network.csv: intermediates/interactions_preprocessed.txt $(EXTRACT_NET_SRC) intermediates
-	$(EXTRACT_NET_EXE) --input "$<" --output "$@" --threshold "$(NET_SIG_THRESHOLD)"
-
-intermediates/partitions.csv: intermediates/network.csv $(PARTITION_SRC) intermediates
-	$(PARTITION_EXE) --input "$<" --output "$@" --threshold "$(PARTITION_THRESHOLD)"
+intermediates/partitions.csv: preprocessing/interactions.txt $(PARTITION_SRC) intermediates
+	$(PARTITION_EXE) --input "$<" \
+	--output "$@" \
+	--score_threshold "$(SCORE_THRESHOLD)" \
+	--degree_threshold "$(DEGREE_THRESHOLD)"
 
 intermediates/domain_counts.csv: data/domains.txt $(DOMAIN_COUNT_SRC) intermediates
 	$(DOMAIN_COUNT_EXE) --input "$<" --output "$@" 
@@ -26,6 +39,11 @@ intermediates/merged_data.csv: intermediates/partitions.csv intermediates/domain
 		--domain_counts intermediates/domain_counts.csv \
 		--output $@
 
+# Plot
+protein_domains_vs_string_degree.png: intermediates/merged_data.csv $(PLOT_SRC)
+	$(PLOT_EXE) --input "$<" --output "$@"
+
 .PHONY: clean
 clean: 
 	rm -rf intermediates
+	rm -rf preprocessing

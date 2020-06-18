@@ -3,13 +3,16 @@ include config.mk
 data:
 	mkdir -p $@
 
-data/string.txt: data
+data/interactions.txt: data
 	curl $(STRING_URL) | gunzip > $@
 
 intermediates:
 	mkdir -p $@
 
-intermediates/network.csv: data/string.txt $(EXTRACT_NET_SRC) intermediates
+intermediates/interactions_preprocessed.txt: data/interactions.txt intermediates
+	 sed -E 's/[0-9]{4}\.//g' "$<" > "$@"
+
+intermediates/network.csv: intermediates/interactions_preprocessed.txt $(EXTRACT_NET_SRC) intermediates
 	$(EXTRACT_NET_EXE) --input "$<" --output "$@" --threshold "$(NET_SIG_THRESHOLD)"
 
 intermediates/partitions.csv: intermediates/network.csv $(PARTITION_SRC) intermediates
@@ -17,6 +20,11 @@ intermediates/partitions.csv: intermediates/network.csv $(PARTITION_SRC) interme
 
 intermediates/domain_counts.csv: data/domains.txt $(DOMAIN_COUNT_SRC) intermediates
 	$(DOMAIN_COUNT_EXE) --input "$<" --output "$@" 
+
+intermediates/merged_data.csv: intermediates/partitions.csv intermediates/domain_counts.csv $(MERGE_SRC)
+	$(MERGE_EXE) --partitions intermediates/partitions.csv \
+		--domain_counts intermediates/domain_counts.csv \
+		--output $@
 
 .PHONY: clean
 clean: 

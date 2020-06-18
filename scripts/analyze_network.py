@@ -46,12 +46,12 @@ def partition_network(graph: nx.Graph, threshold: float) -> pd.DataFrame:
 @click.option("--degree_threshold", "-d", help="Threshold which is used for partitioning based on degree", default=100)
 def main(input, output, score_threshold, degree_threshold):
     """Takes a table of interaction scores and determines for each protein if it is well connected"""
-    edgelist = pd.read_csv(input)
+    edgelist = pd.read_csv(input, sep=" ")
     graph = nx.from_pandas_edgelist(
         edgelist, source='protein1', target='protein2', edge_attr='combined_score')
     remove_insignificant_edges(graph, score_threshold)
     result = partition_network(graph, degree_threshold)
-    result.to_csv(output)
+    result.to_csv(output, index=False)
 
 
 if __name__ == "__main__":

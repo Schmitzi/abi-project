@@ -55,6 +55,7 @@ def main(input, output):
     """Counts the domains in each protein"""
     data = pd.read_csv("data/domains.txt", sep="\t")
     result = count_domains(data)
+    result.index.name = "Protein"
     result.to_csv(output)
 
 

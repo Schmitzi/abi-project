@@ -18,7 +18,7 @@ def partition_network(graph: nx.Graph, threshold: float) -> pd.DataFrame:
     degree_iter = iter(graph.degree())
     partitions = pd.DataFrame([(name, degree > threshold)
                                for (name, degree) in degree_iter])
-    partitions.columns = ['protein', 'well_connected']
+    partitions.columns = ['Protein', 'Well_connected']
     return partitions
 
 

@@ -4,7 +4,7 @@ import pandas as pd
 import click
 
 
-def extract_proteins_without_domains(data: pd.DataFrame):
+def extract_proteins_without_domains(data: pd.DataFrame) -> pd.DataFrame:
     """Finds proteins without domains (i.e. Pfam ID is NaN) and lists them in a DataFrame
 
     Arguments:  
@@ -19,7 +19,7 @@ def extract_proteins_without_domains(data: pd.DataFrame):
     return result_df
 
 
-def get_domain_count(data: pd.DataFrame):
+def get_domain_count(data: pd.DataFrame) -> pd.DataFrame:
     """Finds proteins with at least one domain and counts their number of domains
 
     Arguments:  
@@ -34,7 +34,7 @@ def get_domain_count(data: pd.DataFrame):
     return count_df
 
 
-def count_domains(data: pd.DataFrame):
+def count_domains(data: pd.DataFrame) -> pd.DataFrame:
     """Calculates the number of domains for each protein
 
     Arguments:  

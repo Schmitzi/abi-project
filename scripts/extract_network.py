@@ -4,7 +4,7 @@ import pandas as pd
 import click
 
 
-def extract_network(data: pd.DataFrame, threshold: float):
+def extract_network(data: pd.DataFrame, threshold: float) -> pd.DataFrame:
     """Extracts an adjacency list from a DataFrame given an interaction-score threshold
 
     Arguments:  

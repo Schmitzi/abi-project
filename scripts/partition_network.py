@@ -5,7 +5,7 @@ import pandas as pd
 import click
 
 
-def partition_network(graph: nx.Graph, threshold: float):
+def partition_network(graph: nx.Graph, threshold: float) -> pd.DataFrame:
     """Partitions the given network based on degree
 
     Arguments:  

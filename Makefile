@@ -30,12 +30,14 @@ preprocessing/domains.txt: data/domains.txt | preprocessing
 intermediates:
 	mkdir -p $@
 
+# Partition interaction network
 intermediates/partitions.csv: preprocessing/interactions.txt $(PARTITION_SRC) | intermediates
 	$(PARTITION_EXE) --input "$<" \
 	--output "$@" \
 	--score_threshold "$(SCORE_THRESHOLD)" \
 	--degree_threshold "$(DEGREE_THRESHOLD)"
 
+# Count number of domains
 intermediates/domain_counts.csv: preprocessing/domains.txt $(DOMAIN_COUNT_SRC) | intermediates
 	$(DOMAIN_COUNT_EXE) --input "$<" --output "$@" 
 

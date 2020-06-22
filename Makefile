@@ -8,7 +8,10 @@ data:
 	mkdir -p $@
 
 data/interactions.txt: | data
-	curl $(STRING_URL) | gunzip > $@
+	curl $(STRING_URL) | gunzip > "$@"
+
+data/domains.txt: | data
+	curl $(DOMAIN_URL) > "$@"
 
 # Do some rudimentary preprocessing to strip info we don't need
 preprocessing:
@@ -47,5 +50,6 @@ protein_domains_vs_string_degree.png: intermediates/merged_data.csv $(PLOT_SRC)
 
 .PHONY: clean
 clean: 
+	rm -rf data
 	rm -rf intermediates
 	rm -rf preprocessing

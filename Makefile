@@ -7,31 +7,33 @@ all: protein_domains_vs_string_degree.png
 data:
 	mkdir -p $@
 
-data/interactions.txt: data
+data/interactions.txt: | data
 	curl $(STRING_URL) | gunzip > $@
 
 # Do some rudimentary preprocessing to strip info we don't need
 preprocessing:
 	mkdir -p $@
 
-preprocessing/interactions.txt: data/interactions.txt preprocessing
+# Protein IDs have version numbers prependend
+preprocessing/interactions.txt: data/interactions.txt | preprocessing
 	 sed -E 's/[0-9]{4}\.//g' "$<" > "$@"
 
 # Table of domains has a lot of duplicate entries
-preprocessing/domains.txt: data/domains.txt preprocessing
-	sort -u "$<" > "$@"
+preprocessing/domains.txt: data/domains.txt | preprocessing
+	head -n 1 "$<" > "$@"
+	tail -n +2 "$<" | sort -u >> "$@"
 
 # Compute intermediate results
 intermediates:
 	mkdir -p $@
 
-intermediates/partitions.csv: preprocessing/interactions.txt $(PARTITION_SRC) intermediates
+intermediates/partitions.csv: preprocessing/interactions.txt $(PARTITION_SRC) | intermediates
 	$(PARTITION_EXE) --input "$<" \
 	--output "$@" \
 	--score_threshold "$(SCORE_THRESHOLD)" \
 	--degree_threshold "$(DEGREE_THRESHOLD)"
 
-intermediates/domain_counts.csv: data/domains.txt $(DOMAIN_COUNT_SRC) intermediates
+intermediates/domain_counts.csv: preprocessing/domains.txt $(DOMAIN_COUNT_SRC) | intermediates
 	$(DOMAIN_COUNT_EXE) --input "$<" --output "$@" 
 
 intermediates/merged_data.csv: intermediates/partitions.csv intermediates/domain_counts.csv $(MERGE_SRC)

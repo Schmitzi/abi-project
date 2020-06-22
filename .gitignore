@@ -1,4 +1,7 @@
 data/
 intermediates/
+preprocessing/
 .vscode/
 .DS_Store
+
+protein_domains_vs_string_degree.png

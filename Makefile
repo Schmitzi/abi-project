@@ -8,10 +8,10 @@ data:
 	mkdir -p $@
 
 data/interactions.txt: | data
-	curl $(STRING_URL) | gunzip > "$@"
+	curl "$(STRING_URL)" | gunzip > "$@"
 
 data/domains.txt: | data
-	curl $(DOMAIN_URL) > "$@"
+	wget -O "$@" '$(DOMAIN_URL)'
 
 # Do some rudimentary preprocessing to strip info we don't need
 preprocessing:
@@ -38,7 +38,7 @@ intermediates/partitions.csv: preprocessing/interactions.txt $(PARTITION_SRC) | 
 	--degree_threshold "$(DEGREE_THRESHOLD)"
 
 # Count number of domains
-intermediates/domain_counts.csv: preprocessing/domains.txt $(DOMAIN_COUNT_SRC) | intermediates
+intermediates/domain_counts.csv: data/domains.txt $(DOMAIN_COUNT_SRC) | intermediates
 	$(DOMAIN_COUNT_EXE) --input "$<" --output "$@" 
 
 intermediates/merged_data.csv: intermediates/partitions.csv intermediates/domain_counts.csv $(MERGE_SRC)
@@ -55,3 +55,4 @@ clean:
 	rm -rf data
 	rm -rf intermediates
 	rm -rf preprocessing
+	rm -f protein_domains_vs_string_degree.png

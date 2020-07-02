@@ -14,7 +14,9 @@ def plot_data(data: pd.DataFrame) -> sb.FacetGrid:
     Returns:  
     A boxplot with connection class on x and number of domains on y axis
     """
-    return sb.catplot(x="Well_connected", y="Domains", data=data, kind="box")
+    return sb.catplot(x="Well_connected", y="Domains", data=data, kind="box", showfliers=False).set(
+        title="Domains vs STRING degree (Outliers not shown)",
+        xlabel="Well connected", ylabel="# Domains")
 
 
 @click.command()
